@@ -23,6 +23,7 @@
     size: "{{ item.size | human_to_bytes }}B"
     opts: "{{ capra_lvm_filesystem_lvcreate_options }}"
   with_list: "{{ capra_lvm_filesystem_specs }}"
+  when: (item.state | default('present')) == 'present'
 
 - name: Create filesystem
   filesystem:
@@ -31,6 +32,7 @@
     opts: "{{ capra_lvm_filesystem_filesystem_options }}"
     resizefs: true
   with_list: "{{ capra_lvm_filesystem_specs }}"
+  when: (item.state | default('present')) == 'present'
 
 - name: Mount volume
   mount:
@@ -40,8 +42,9 @@
     opts: "{{ item.options | default(capra_lvm_filesystem_options) }}"
     state: mounted
   with_list: "{{ capra_lvm_filesystem_specs }}"
+  when: (item.state | default('present')) == 'present'
 
-- name: "Set volume permissions"
+- name: Set volume permissions
   file:
     path: "{{ item.path | default(capra_lvm_filesystem_parent_path + '/' + item.name) }}"
     state: directory
@@ -53,3 +56,4 @@
     setype: "{{ item.setype | default(capra_lvm_filesystem_setype) }}"
     selevel: "{{ item.selevel | default(capra_lvm_filesystem_selevel) }}"
   with_list: "{{ capra_lvm_filesystem_specs }}"
+  when: (item.state | default('present')) == 'present'
