@@ -34,15 +34,30 @@
   with_list: "{{ capra_lvm_filesystem_specs }}"
   when: (item.state | default('present')) == 'present'
 
+- name: Look up volume UUIDs
+  command: >-
+    /sbin/blkid
+    -c /dev/null
+    -o value
+    -s UUID
+    {{ '/dev/' ~ r_capra_lvm_filesystem_vg ~ '/' ~ item.name | quote }}
+  changed_when: false
+  register: r_capra_lvm_filesystem_blkid
+  with_list: "{{ capra_lvm_filesystem_specs }}"
+  tags: [always]
+  check_mode: false
+  vars:
+    r_capra_lvm_filesystem_vg: "{{ item.vg | default(capra_lvm_filesystem_vg) }}"
+
 - name: Mount volume
   mount:
-    path: "{{ item.path | default(capra_lvm_filesystem_parent_path + '/' + item.name) }}"
-    src: "/dev/{{ item.vg | default(capra_lvm_filesystem_vg) }}/{{ item.name }}"
-    fstype: "{{ item.fstype | default(capra_lvm_filesystem_fstype) }}"
-    opts: "{{ item.options | default(capra_lvm_filesystem_options) }}"
+    path: "{{ item.1.path | default(capra_lvm_filesystem_parent_path + '/' + item.1.name) }}"
+    src: "UUID={{ r_capra_lvm_filesystem_blkid.results[item.0].stdout }}"
+    fstype: "{{ item.1.fstype | default(capra_lvm_filesystem_fstype) }}"
+    opts: "{{ item.1.options | default(capra_lvm_filesystem_options) }}"
     state: mounted
-  with_list: "{{ capra_lvm_filesystem_specs }}"
-  when: (item.state | default('present')) == 'present'
+  with_indexed_items: "{{ capra_lvm_filesystem_specs }}"
+  when: (item.1.state | default('present')) == 'present'
 
 - name: Set volume permissions
   file:
