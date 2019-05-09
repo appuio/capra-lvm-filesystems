@@ -1,0 +1,25 @@
+---
+- name: Install required packages
+  package:
+    name: "{{ capra_lvm_filesystem_packages }}"
+    state: present
+
+- name: Configure default mountpoint directory
+  file:
+    path: "{{ capra_lvm_filesystem_parent_path }}"
+    state: directory
+    owner: "{{ capra_lvm_filesystem_owner }}"
+    group: "{{ capra_lvm_filesystem_group }}"
+    mode: 0755
+    seuser: unconfined_u
+    serole: object_r
+    setype: default_t
+    selevel: s0
+
+- name: Create logical volume
+  lvol:
+    vg: "{{ item.vg | default(capra_lvm_filesystem_vg) }}"
+    lv: "{{ item.name | mandatory }}"
+    size: "{{ item.size | human_to_bytes }}B"
+    opts: "{{ capra_lvm_filesystem_lvcreate_options }}"
+  with_list: "{{ capra_lvm_filesystem_specs }}"
