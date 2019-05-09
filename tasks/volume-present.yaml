@@ -4,6 +4,7 @@
     lv: "{{ item.name | mandatory }}"
     size: "{{ item.size | human_to_bytes }}B"
     opts: "{{ capra_lvm_filesystem_lvcreate_options }}"
+    state: present
   with_list: "{{ capra_lvm_filesystem_specs }}"
   when: (item.state | default('present')) == 'present'
 
@@ -28,6 +29,7 @@
   with_list: "{{ capra_lvm_filesystem_specs }}"
   tags: [always]
   check_mode: false
+  when: (item.state | default('present')) == 'present'
   vars:
     r_capra_lvm_filesystem_vg: "{{ item.vg | default(capra_lvm_filesystem_vg) }}"
 

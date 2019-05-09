@@ -59,6 +59,17 @@ and are mounted.
   wold be set in `/etc/fstab`.
   Defaults to `defaults`.
 
+## Tags
+
+The following tags can be used to control the executed actions:
+
+* `capra-lvm-filesystem-prerequisites`:
+  Actions required to be done once which ensure the other actions can succeed.
+* `capra-lvm-filesystem-create`:
+  Actions required to create a new volume/filesystem/mount.
+* `capra-lvm-filesystem-remove`:
+  Actions required to remove a mount/volume.
+
 ## Example Playbook
 
 ```yaml

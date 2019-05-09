@@ -4,3 +4,12 @@
     state: absent
   with_list: "{{ capra_lvm_filesystem_specs }}"
   when: (item.state | default('present')) == 'absent'
+
+- name: Remove logical volume
+  lvol:
+    vg: "{{ item.vg | default(capra_lvm_filesystem_vg) }}"
+    lv: "{{ item.name | mandatory }}"
+    state: absent
+    force: true
+  with_list: "{{ capra_lvm_filesystem_specs }}"
+  when: (item.state | default('present')) == 'absent'

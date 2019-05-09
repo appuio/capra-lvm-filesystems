@@ -3,6 +3,7 @@
   package:
     name: "{{ capra_lvm_filesystem_packages }}"
     state: present
+  tags: [capra-lvm-filesystem-prerequisites]
 
 - name: Configure default mountpoint directory
   file:
@@ -15,6 +16,10 @@
     serole: object_r
     setype: default_t
     selevel: s0
+  tags: [capra-lvm-filesystem-prerequisites]
 
 - import_tasks: volume-absent.yaml
+  tags: [capra-lvm-filesystem-remove]
+
 - import_tasks: volume-present.yaml
+  tags: [capra-lvm-filesystem-create]
