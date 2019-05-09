@@ -15,3 +15,4 @@ capra_lvm_filesystem_packages:
   - lvm2
   - xfsprogs
 capra_lvm_filesystem_lvcreate_options: "--wipesignatures y --zero y"
+capra_lvm_filesystem_filesystem_options: "-i size=512 -n size=8192"
