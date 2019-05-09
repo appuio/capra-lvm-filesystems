@@ -1,0 +1,13 @@
+---
+capra_volume_volumes: []
+capra_volume_vg: vg
+capra_volume_fstype: xfs
+capra_volume_mount_parent: "/mnt"
+capra_volume_owner: "root"
+capra_volume_group: "root"
+capra_volume_mode: "0755"
+capra_volume_seuser: "unconfined_u"
+capra_volume_serole: "object_r"
+capra_volume_setype: "svirt_sandbox_file_t"
+capra_volume_selevel: "s0"
+capra_volume_options: "defaults"
