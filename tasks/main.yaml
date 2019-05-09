@@ -31,3 +31,12 @@
     opts: "{{ capra_lvm_filesystem_filesystem_options }}"
     resizefs: true
   with_list: "{{ capra_lvm_filesystem_specs }}"
+
+- name: Mount volume
+  mount:
+    path: "{{ item.path | default(capra_lvm_filesystem_parent_path + '/' + item.name) }}"
+    src: "/dev/{{ item.vg | default(capra_lvm_filesystem_vg) }}/{{ item.name }}"
+    fstype: "{{ item.fstype | default(capra_lvm_filesystem_fstype) }}"
+    opts: "{{ item.options | default(capra_lvm_filesystem_options) }}"
+    state: mounted
+  with_list: "{{ capra_lvm_filesystem_specs }}"
