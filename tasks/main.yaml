@@ -40,3 +40,16 @@
     opts: "{{ item.options | default(capra_lvm_filesystem_options) }}"
     state: mounted
   with_list: "{{ capra_lvm_filesystem_specs }}"
+
+- name: "Set volume permissions"
+  file:
+    path: "{{ item.path | default(capra_lvm_filesystem_parent_path + '/' + item.name) }}"
+    state: directory
+    owner: "{{ item.owner | default(capra_lvm_filesystem_owner) }}"
+    group: "{{ item.group | default(capra_lvm_filesystem_group) }}"
+    mode: "{{ item.mode | default(capra_lvm_filesystem_mode) }}"
+    seuser: "{{ item.seuser | default(capra_lvm_filesystem_seuser) }}"
+    serole: "{{ item.serole | default(capra_lvm_filesystem_serole) }}"
+    setype: "{{ item.setype | default(capra_lvm_filesystem_setype) }}"
+    selevel: "{{ item.selevel | default(capra_lvm_filesystem_selevel) }}"
+  with_list: "{{ capra_lvm_filesystem_specs }}"
