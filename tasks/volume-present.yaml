@@ -6,7 +6,6 @@
     opts: "{{ capra_lvm_filesystem_lvcreate_options }}"
     state: present
   with_list: "{{ capra_lvm_filesystem_specs }}"
-  when: (item.state | default('present')) == 'present'
 
 - name: Create filesystem
   filesystem:
@@ -15,7 +14,6 @@
     opts: "{{ capra_lvm_filesystem_filesystem_options }}"
     resizefs: true
   with_list: "{{ capra_lvm_filesystem_specs }}"
-  when: (item.state | default('present')) == 'present'
 
 - name: Look up volume UUIDs
   command: >-
@@ -35,7 +33,7 @@
 
 - name: Mount volume
   mount:
-    path: "{{ item.1.path | default(capra_lvm_filesystem_parent_path + '/' + item.1.name) }}"
+    path: "{{ item.1.path | default(capra_lvm_filesystem_parent_path ~ '/' ~ item.1.name) }}"
     src: "UUID={{ r_capra_lvm_filesystem_blkid.results[item.0].stdout }}"
     fstype: "{{ item.1.fstype | default(capra_lvm_filesystem_fstype) }}"
     opts: "{{ item.1.options | default(capra_lvm_filesystem_options) }}"
@@ -45,7 +43,7 @@
 
 - name: Set volume permissions
   file:
-    path: "{{ item.path | default(capra_lvm_filesystem_parent_path + '/' + item.name) }}"
+    path: "{{ r_capra_lvm_filesystem_path }}"
     state: directory
     owner: "{{ item.owner | default(capra_lvm_filesystem_owner) }}"
     group: "{{ item.group | default(capra_lvm_filesystem_group) }}"
@@ -55,4 +53,3 @@
     setype: "{{ item.setype | default(capra_lvm_filesystem_setype) }}"
     selevel: "{{ item.selevel | default(capra_lvm_filesystem_selevel) }}"
   with_list: "{{ capra_lvm_filesystem_specs }}"
-  when: (item.state | default('present')) == 'present'

@@ -18,8 +18,14 @@
     selevel: s0
   tags: [capra-lvm-filesystem-prerequisites]
 
-- import_tasks: volume-absent.yaml
-  tags: [capra-lvm-filesystem-remove]
+- vars:
+    r_capra_lvm_filesystem_path: "{{ item.path | default(capra_lvm_filesystem_parent_path ~ '/' ~ item.name) }}"
+    r_capra_lvm_filesystem_state: "{{ item.state | default('present')}}"
+  block:
+    - when: r_capra_lvm_filesystem_state == 'absent'
+      import_tasks: volume-absent.yaml
+      tags: [capra-lvm-filesystem-remove]
 
-- import_tasks: volume-present.yaml
-  tags: [capra-lvm-filesystem-create]
+    - when: r_capra_lvm_filesystem_state == 'present'
+      import_tasks: volume-present.yaml
+      tags: [capra-lvm-filesystem-create]

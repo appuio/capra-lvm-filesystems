@@ -1,15 +1,13 @@
 - name: Unmount volume
   mount:
-    path: "{{ item.mount | default(capra_lvm_filesystem_mount_parent + '/' + item.name) }}"
+    path: "{{ r_capra_lvm_filesystem_path }}"
     state: absent
   with_list: "{{ capra_lvm_filesystem_specs }}"
-  when: (item.state | default('present')) == 'absent'
 
 - name: Remove logical volume
   lvol:
     vg: "{{ item.vg | default(capra_lvm_filesystem_vg) }}"
     lv: "{{ item.name | mandatory }}"
     state: absent
-    force: true
+    force: yes
   with_list: "{{ capra_lvm_filesystem_specs }}"
-  when: (item.state | default('present')) == 'absent'
