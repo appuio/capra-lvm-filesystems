@@ -38,6 +38,7 @@
     fstype: "{{ item[1].fstype | default(capra_lvm_filesystem_fstype) }}"
     opts: "{{ item[1].options | default(capra_lvm_filesystem_options) }}"
     state: mounted
+  register: r_capra_lvm_filesystem_mount
   with_together:
     - "{{ r_capra_lvm_filesystem_blkid.results }}"
     - "{{ capra_lvm_filesystem_specs }}"
@@ -61,7 +62,8 @@
     serole: "{{ item[1].serole | default(capra_lvm_filesystem_serole) }}"
     setype: "{{ item[1].setype | default(capra_lvm_filesystem_setype) }}"
     selevel: "{{ item[1].selevel | default(capra_lvm_filesystem_selevel) }}"
-  when: r_capra_lvm_filesystem_state == 'present' and item[0].changed
+  when: r_capra_lvm_filesystem_state == 'present' and item[0].changed and not item[2].failed
   with_together:
     - "{{ r_capra_lvm_filesystem_fs.results }}"
     - "{{ capra_lvm_filesystem_specs }}"
+    - "{{ r_capra_lvm_filesystem_mount.results }}"
