@@ -1,18 +1,18 @@
 - name: Create logical volume
   lvol:
-    vg: "{{ item.vg | default(capra_lvm_filesystem_vg) }}"
-    lv: "{{ item.name | mandatory }}"
-    size: "{{ item.size | human_to_bytes }}B"
+    vg: "{{ item[1].vg | default(capra_lvm_filesystem_vg) }}"
+    lv: "{{ item[1].name | mandatory }}"
+    size: "{{ item[1].size | human_to_bytes }}B"
     opts: "{{ capra_lvm_filesystem_lvcreate_options }}"
     state: present
-  with_list: "{{ capra_lvm_filesystem_specs }}"
+  with_indexed_items: "{{ capra_lvm_filesystem_specs }}"
 
 - name: Create filesystem
   filesystem:
-    fstype: "{{ item.fstype | default(capra_lvm_filesystem_fstype) }}"
-    dev: "/dev/{{ item.vg | default(capra_lvm_filesystem_vg) }}/{{ item.name }}"
+    fstype: "{{ item[1].fstype | default(capra_lvm_filesystem_fstype) }}"
+    dev: "/dev/{{ item[1].vg | default(capra_lvm_filesystem_vg) }}/{{ item[1].name }}"
     opts: "{{ capra_lvm_filesystem_filesystem_options }}"
-  with_list: "{{ capra_lvm_filesystem_specs }}"
+  with_indexed_items: "{{ capra_lvm_filesystem_specs }}"
 
 - name: Look up volume UUIDs
   command: >-
@@ -20,43 +20,44 @@
     -c /dev/null
     -o value
     -s UUID
-    {{ '/dev/' ~ r_capra_lvm_filesystem_vg ~ '/' ~ item.name | quote }}
+    {{ '/dev/' ~ r_capra_lvm_filesystem_vg ~ '/' ~ item[1].name | quote }}
   changed_when: false
   register: r_capra_lvm_filesystem_blkid
-  with_list: "{{ capra_lvm_filesystem_specs }}"
+  with_indexed_items: "{{ capra_lvm_filesystem_specs }}"
   tags: [always]
   check_mode: false
   when: (item.state | default('present')) == 'present'
   vars:
-    r_capra_lvm_filesystem_vg: "{{ item.vg | default(capra_lvm_filesystem_vg) }}"
+    r_capra_lvm_filesystem_vg: "{{ item[1].vg | default(capra_lvm_filesystem_vg) }}"
 
 - name: Mount volume
   mount:
-    path: "{{ item.1.path | default(capra_lvm_filesystem_parent_path ~ '/' ~ item.1.name) }}"
-    src: "UUID={{ r_capra_lvm_filesystem_blkid.results[item.0].stdout }}"
-    fstype: "{{ item.1.fstype | default(capra_lvm_filesystem_fstype) }}"
-    opts: "{{ item.1.options | default(capra_lvm_filesystem_options) }}"
+    path: "{{ item[1].path | default(capra_lvm_filesystem_parent_path ~ '/' ~ item[1].name) }}"
+    src: "UUID={{ item[0].stdout }}"
+    fstype: "{{ item[1].fstype | default(capra_lvm_filesystem_fstype) }}"
+    opts: "{{ item[1].options | default(capra_lvm_filesystem_options) }}"
     state: mounted
-  with_indexed_items: "{{ capra_lvm_filesystem_specs }}"
-  when: (item.1.state | default('present')) == 'present'
+  with_together:
+    - "{{ r_capra_lvm_filesystem_blkid.results }}"
+    - "{{ capra_lvm_filesystem_specs }}"
 
 - name: Resize filesystem
   filesystem:
-    fstype: "{{ item.fstype | default(capra_lvm_filesystem_fstype) }}"
-    dev: "/dev/{{ item.vg | default(capra_lvm_filesystem_vg) }}/{{ item.name }}"
+    fstype: "{{ item[1].fstype | default(capra_lvm_filesystem_fstype) }}"
+    dev: "/dev/{{ item[1].vg | default(capra_lvm_filesystem_vg) }}/{{ item[1].name }}"
     opts: "{{ capra_lvm_filesystem_filesystem_options }}"
     resizefs: true
-  with_list: "{{ capra_lvm_filesystem_specs }}"
+  with_indexed_items: "{{ capra_lvm_filesystem_specs }}"
 
 - name: Set volume permissions
   file:
     path: "{{ r_capra_lvm_filesystem_path }}"
     state: directory
-    owner: "{{ item.owner | default(capra_lvm_filesystem_owner) }}"
-    group: "{{ item.group | default(capra_lvm_filesystem_group) }}"
-    mode: "{{ item.mode | default(capra_lvm_filesystem_mode) }}"
-    seuser: "{{ item.seuser | default(capra_lvm_filesystem_seuser) }}"
-    serole: "{{ item.serole | default(capra_lvm_filesystem_serole) }}"
-    setype: "{{ item.setype | default(capra_lvm_filesystem_setype) }}"
-    selevel: "{{ item.selevel | default(capra_lvm_filesystem_selevel) }}"
-  with_list: "{{ capra_lvm_filesystem_specs }}"
+    owner: "{{ item[1].owner | default(capra_lvm_filesystem_owner) }}"
+    group: "{{ item[1].group | default(capra_lvm_filesystem_group) }}"
+    mode: "{{ item[1].mode | default(capra_lvm_filesystem_mode) }}"
+    seuser: "{{ item[1].seuser | default(capra_lvm_filesystem_seuser) }}"
+    serole: "{{ item[1].serole | default(capra_lvm_filesystem_serole) }}"
+    setype: "{{ item[1].setype | default(capra_lvm_filesystem_setype) }}"
+    selevel: "{{ item[1].selevel | default(capra_lvm_filesystem_selevel) }}"
+  with_indexed_items: "{{ capra_lvm_filesystem_specs }}"

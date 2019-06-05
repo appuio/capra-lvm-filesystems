@@ -2,12 +2,12 @@
   mount:
     path: "{{ r_capra_lvm_filesystem_path }}"
     state: absent
-  with_list: "{{ capra_lvm_filesystem_specs }}"
+  with_indexed_items: "{{ capra_lvm_filesystem_specs }}"
 
 - name: Remove logical volume
   lvol:
-    vg: "{{ item.vg | default(capra_lvm_filesystem_vg) }}"
-    lv: "{{ item.name | mandatory }}"
+    vg: "{{ item[1].vg | default(capra_lvm_filesystem_vg) }}"
+    lv: "{{ item[1].name | mandatory }}"
     state: absent
     force: yes
-  with_list: "{{ capra_lvm_filesystem_specs }}"
+  with_indexed_items: "{{ capra_lvm_filesystem_specs }}"

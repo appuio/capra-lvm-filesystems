@@ -19,8 +19,8 @@
   tags: [capra-lvm-filesystem-prerequisites]
 
 - vars:
-    r_capra_lvm_filesystem_path: "{{ item.path | default(capra_lvm_filesystem_parent_path ~ '/' ~ item.name) }}"
-    r_capra_lvm_filesystem_state: "{{ item.state | default('present')}}"
+    r_capra_lvm_filesystem_path: "{{ item[1].path | default(capra_lvm_filesystem_parent_path ~ '/' ~ item[1].name) }}"
+    r_capra_lvm_filesystem_state: "{{ item[1].state | default('present')}}"
   block:
     - when: r_capra_lvm_filesystem_state == 'absent'
       import_tasks: volume-absent.yaml
