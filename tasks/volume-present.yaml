@@ -12,6 +12,7 @@
     fstype: "{{ item[1].fstype | default(capra_lvm_filesystem_fstype) }}"
     dev: "/dev/{{ item[1].vg | default(capra_lvm_filesystem_vg) }}/{{ item[1].name }}"
     opts: "{{ capra_lvm_filesystem_filesystem_options }}"
+  register: r_capra_lvm_filesystem_fs
   with_indexed_items: "{{ capra_lvm_filesystem_specs }}"
 
 - name: Look up volume UUIDs
@@ -60,4 +61,7 @@
     serole: "{{ item[1].serole | default(capra_lvm_filesystem_serole) }}"
     setype: "{{ item[1].setype | default(capra_lvm_filesystem_setype) }}"
     selevel: "{{ item[1].selevel | default(capra_lvm_filesystem_selevel) }}"
-  with_indexed_items: "{{ capra_lvm_filesystem_specs }}"
+  when: r_capra_lvm_filesystem_state == 'present' and item[0].changed
+  with_together:
+    - "{{ r_capra_lvm_filesystem_fs.results }}"
+    - "{{ capra_lvm_filesystem_specs }}"
