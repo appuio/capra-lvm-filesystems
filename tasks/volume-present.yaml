@@ -12,7 +12,6 @@
     fstype: "{{ item.fstype | default(capra_lvm_filesystem_fstype) }}"
     dev: "/dev/{{ item.vg | default(capra_lvm_filesystem_vg) }}/{{ item.name }}"
     opts: "{{ capra_lvm_filesystem_filesystem_options }}"
-    resizefs: true
   with_list: "{{ capra_lvm_filesystem_specs }}"
 
 - name: Look up volume UUIDs
@@ -40,6 +39,14 @@
     state: mounted
   with_indexed_items: "{{ capra_lvm_filesystem_specs }}"
   when: (item.1.state | default('present')) == 'present'
+
+- name: Resize filesystem
+  filesystem:
+    fstype: "{{ item.fstype | default(capra_lvm_filesystem_fstype) }}"
+    dev: "/dev/{{ item.vg | default(capra_lvm_filesystem_vg) }}/{{ item.name }}"
+    opts: "{{ capra_lvm_filesystem_filesystem_options }}"
+    resizefs: true
+  with_list: "{{ capra_lvm_filesystem_specs }}"
 
 - name: Set volume permissions
   file:
