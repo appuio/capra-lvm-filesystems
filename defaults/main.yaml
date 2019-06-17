@@ -1,0 +1,18 @@
+---
+capra_lvm_filesystem_specs: []
+capra_lvm_filesystem_vg: vg
+capra_lvm_filesystem_fstype: xfs
+capra_lvm_filesystem_mount_parent: "/mnt"
+capra_lvm_filesystem_owner: "root"
+capra_lvm_filesystem_group: "root"
+capra_lvm_filesystem_mode: "0755"
+capra_lvm_filesystem_seuser: "unconfined_u"
+capra_lvm_filesystem_serole: "object_r"
+capra_lvm_filesystem_setype: "svirt_sandbox_file_t"
+capra_lvm_filesystem_selevel: "s0"
+capra_lvm_filesystem_options: "defaults"
+capra_lvm_filesystem_packages:
+  - lvm2
+  - xfsprogs
+capra_lvm_filesystem_lvcreate_options: "--wipesignatures y --zero y"
+capra_lvm_filesystem_filesystem_options: "-i size=512 -n size=8192"

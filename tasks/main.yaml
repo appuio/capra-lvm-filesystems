@@ -1,0 +1,31 @@
+---
+- name: Install required packages
+  package:
+    name: "{{ capra_lvm_filesystem_packages }}"
+    state: present
+  tags: [capra-lvm-filesystem-prerequisites]
+
+- name: Configure default mountpoint directory
+  file:
+    path: "{{ capra_lvm_filesystem_parent_path }}"
+    state: directory
+    owner: "{{ capra_lvm_filesystem_owner }}"
+    group: "{{ capra_lvm_filesystem_group }}"
+    mode: 0755
+    seuser: unconfined_u
+    serole: object_r
+    setype: default_t
+    selevel: s0
+  tags: [capra-lvm-filesystem-prerequisites]
+
+- vars:
+    r_capra_lvm_filesystem_path: "{{ item[1].path | default(capra_lvm_filesystem_parent_path ~ '/' ~ item[1].name) }}"
+    r_capra_lvm_filesystem_state: "{{ item[1].state | default('present')}}"
+  block:
+    - when: r_capra_lvm_filesystem_state == 'absent'
+      import_tasks: volume-absent.yaml
+      tags: [capra-lvm-filesystem-remove]
+
+    - when: r_capra_lvm_filesystem_state == 'present'
+      import_tasks: volume-present.yaml
+      tags: [capra-lvm-filesystem-create]

@@ -1,0 +1,6 @@
+galaxy_info:
+  author: Christian Häusler
+  description: Ansible role for managing logical volumes on LVM, ensure they have a file system and are mounted at some place.
+  company: VSHN AG
+  license: BSD
+  min_ansible_version: 2.4
