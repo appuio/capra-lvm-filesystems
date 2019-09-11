@@ -81,14 +81,14 @@ The following tags can be used to control the executed actions:
     capra_lvm_filesystem_filesystem_options: ~
   roles:
     - role: "capra-lvm-filesystems"
-      capra_lvm_filesystem_mount_parent: "{{ my_local_volume_path }}/ssd"
+      capra_lvm_filesystem_parent_path: "{{ my_local_volume_path }}/ssd"
       capra_lvm_filesystem_specs:
         - name: "{{ inventory_hostname + '7jOa' | to_uuid }}"
           size: 5G
         - name: "{{ inventory_hostname + 'NobF' | to_uuid }}"
           size: 5G
     - role: "capra-lvm-filesystems"
-      capra_lvm_filesystem_mount_parent: "{{ my_local_volume_path }}/ssd-retain"
+      capra_lvm_filesystem_parent_path: "{{ my_local_volume_path }}/ssd-retain"
       capra_lvm_filesystem_specs:
         - name: "{{ inventory_hostname + 'eX5e' | to_uuid }}"
           size: 5G
