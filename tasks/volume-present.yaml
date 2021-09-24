@@ -5,6 +5,7 @@
     size: "{{ item[1].size | human_to_bytes }}B"
     opts: "{{ capra_lvm_filesystem_lvcreate_options }}"
     state: present
+    shrink: no
   with_indexed_items: "{{ capra_lvm_filesystem_specs }}"
 
 - name: Create filesystem
